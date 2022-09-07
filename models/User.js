@@ -59,6 +59,12 @@ UserSchema.pre('save', async function (next) {
   next()
 })
 
+//match user entered password(during login) to hashed password in database
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+  const user = this //this is the current instance of the user
+  return await bcrypt.compare(enteredPassword, user.password)
+}
+
 //create a signed JWT and return it when a user is registered
 UserSchema.methods.getSignedJwtToken = function () {
   const user = this //this is the current instance of the user
