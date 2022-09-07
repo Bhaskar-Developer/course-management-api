@@ -1,7 +1,6 @@
 const asyncHandler = require('../middlewares/async')
 const User = require('../models/User')
-
-
+const errorResponse = require('../utils/errorResponse')
 
 //@desc     Register OR SignUp User
 //@route    POST /api/v1/users/register
@@ -17,6 +16,39 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
     password,
     role
   })
+
+  //send the Token response i.e. token with the cookie
+  sendTokenResponse(user, 200, res)
+})
+
+//@desc     Login or SignIn User
+//@route    POST /api/v1/users/login
+//@access   Public
+exports.loginUser = asyncHandler(async (req, res, next) => {
+  //get the email and plain text password from the request body
+  const { email, password } = req.body
+
+  //check if email and password are not null
+  if (!email || !password) {
+    return next(new errorResponse('Please provide an email and password', 400))
+  }
+
+  //check if the user exists in the Database
+  //We select the password manually because it is not selected by default
+  const user = await User.findOne({ email }).select('+password')
+
+  //make sure the user is not null
+  if (!user) {
+    return next(new errorResponse('Invalid credentials', 401))
+  }
+
+  //check if the password is correct i.e. the password entered by the user matches the password in the database
+  const isMatch = await user.matchPassword(password)
+
+  //if the password is incorrect then send an error
+  if (!isMatch) {
+    return next(new errorResponse('Invalid credentials', 401))
+  }
 
   //send the Token response i.e. token with the cookie
   sendTokenResponse(user, 200, res)
