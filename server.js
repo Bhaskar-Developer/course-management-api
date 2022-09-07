@@ -3,8 +3,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
-
-
+const errorHandler = require('./middlewares/error')
 
 // Load Env Variables
 dotenv.config({ path: `${path.resolve()}/config/config.env` })
@@ -12,18 +11,24 @@ dotenv.config({ path: `${path.resolve()}/config/config.env` })
 //Connect to MongoDB
 connectDB()
 
+//Load Route Files
+const user = require('./routes/user.route')
+
 // Create App
 // This will be later separated into a separate folder
 const app = express()
 
+// Use Morgin for logging requests
 app.use(morgan('dev'))
 
-app.get('/test', (req, res) => {
-  res.json({
-    data: {},
-    message: "Server is Running"
-  })
-})
+// Use Body Parser
+app.use(express.json())
+
+// Mount Routes
+app.use('/api/v1/users', user)
+
+// Use Custom Error Handler
+app.use(errorHandler)
 
 const server = app.listen(
   process.env.PORT,
