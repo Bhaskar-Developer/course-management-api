@@ -6,6 +6,7 @@ const errorHandler = (err, req, res, next) => {
   error.message = err.message
 
   console.log('Error: ', err.message)
+  // console.log(err)
 
   //Mongoose Bad ObjectId error
   if (err.name === 'CastError') {
@@ -25,7 +26,14 @@ const errorHandler = (err, req, res, next) => {
   //Validation error. This will run if data is inserted into database without the required fields
   if (err.name === 'ValidationError') {
     //collect and store all validator error messages in message and send it to the errorResponse
-    const message = Object.values(err.errors).map(val => val.message)
+    const message = Object.values(err.errors).map(val => {
+      // send custom message for topics field validation failure
+      if (val.path === 'topics') {
+        val.message = 'Please add topics'
+        return val.message
+      }
+      return val.message
+    })
     error = new errorResponse(message, 400)
   }
 
