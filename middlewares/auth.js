@@ -22,14 +22,20 @@ exports.protectRoute = asyncHandler(async (req, res, next) => {
   try {
     //decode the token and get the userId
     const decodedData = jwt.verify(token, process.env.JWT_SECRET)
-    console.log(decodedData)
-    //check if there is a user with the decoded userId in the database
-    //If the user exists then set this as the req.user
-    //console.log(decodedData.id)
-    req.user = await User.findById(decodedData.id)
+    req.user = await User.findById(decodedData.id).select('name email role _id')
     req.token = token
     next()
   } catch (error) {
     return next(new errorResponse('Not authorized to access this route', 401))
   }
 })
+
+//Grant access to specific roles
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new errorResponse(`User with role ${req.user.role} is not authorized to access this route`, 403))
+    }
+    next()
+  }
+}
