@@ -24,6 +24,24 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
   })
 })
 
+//@desc     GET Single Course
+//@route    GET /api/v1/courses/:id
+//@access   Private
+exports.getCourse = asyncHandler(async (req, res, next) => {
+  const course = await Course.findById(req.params.id)
+
+  //if the course does not exist then return a 404 error
+  if (!course) {
+    return next(new errorResponse(`Course not found with the id of ${req.params.id}`, 404))
+  }
+
+  res.status(200).json({
+    success: true,
+    data: course,
+    message: "Course was fetched successfully."
+  })
+})
+
 //@desc     Add New Course
 //@route    POST /api/v1/courses
 //@access   Private
