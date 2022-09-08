@@ -10,15 +10,29 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
   // If the user accessing this route is employee then show only approved courses
   // If the user accessing the route is super admin or admin then show all courses
 
-  let courses = [];
+  let courses = []
+  let totalCount = 0
+
+  // Pagination Configuration
+  const page = req.query.page !== undefined ? parseInt(req.query.page) : 1
+  const limit = 20
+  const offset = limit * (page - 1)
+
   if (req.user.role === 'employee') {
-    courses = await Course.find({ approved: true })
+    courses = await Course.find({ approved: true }).limit(limit).skip(offset)
+    totalCount = await Course.find({ approved: true }).countDocuments()
   } else {
-    courses = await Course.find({})
+    courses = await Course.find({}).limit(limit).skip(offset)
+    totalCount = await Course.find({}).countDocuments()
   }
 
   res.status(200).json({
     success: true,
+    meta: {
+      page_size: limit,
+      current_page: page,
+      total_pages: Math.ceil(totalCount / limit)
+    },
     data: courses,
     message: "Courses were fetched successfully."
   })
