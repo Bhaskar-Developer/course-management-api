@@ -36,6 +36,10 @@ const CourseSchema = new mongoose.Schema({
     type: [TopicsSchema],
     validate: v => Array.isArray(v) && v.length > 0
   },
+  approved: {
+    type: Boolean,
+    default: false
+  },
   courseFiles: [
     {
       fileId: {
@@ -67,7 +71,7 @@ CourseSchema.pre('save', async function (next) {
   course.totalDuration = 0.0;
   for (let i = 0; i <= course.topics.length - 1; i++) {
     course.topics[i].duration = await getVideoDurationInSeconds(course.topics[i].videoUrl)
-    console.log("Topic Duration: ", course.topics[i].duration)
+    // console.log("Topic Duration: ", course.topics[i].duration)
     course.totalDuration += course.topics[i].duration
   }
 
