@@ -3,6 +3,26 @@ const Course = require('../models/Course')
 const asyncHandler = require('../middlewares/async')
 const errorResponse = require('../utils/errorResponse')
 
+//@desc     GET All Courses
+//@route    GET /api/v1/courses
+//@access   Private
+exports.getCourses = asyncHandler(async (req, res, next) => {
+  // If the user accessing this route is employee then show only approved courses
+  // If the user accessing the route is super admin or admin then show all courses
+
+  let courses = [];
+  if (req.user.role === 'employee') {
+    courses = await Course.find({ approved: true })
+  } else {
+    courses = await Course.find({})
+  }
+
+  res.status(200).json({
+    success: true,
+    data: courses,
+    message: "Courses were fetched successfully."
+  })
+})
 
 //@desc     Add New Course
 //@route    POST /api/v1/courses
