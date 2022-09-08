@@ -19,7 +19,29 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
   const offset = limit * (page - 1)
 
   if (req.user.role === 'employee') {
-    courses = await Course.find({ approved: true }).limit(limit).skip(offset)
+    if (req.query.sort) {
+      if (req.query.sort === 'category') {
+        Course.find({ approved: true }).limit(limit).skip(offset).sort({ "category": 1 }).exec(function (err, data) {
+          if (err) {
+            console.log(err)
+            return next(new errorResponse(`Something went wrong`, 500))
+          }
+          courses = data
+        })
+      }
+
+      if (req.query.sort === '-category') {
+        Course.find({ approved: true }).limit(limit).skip(offset).sort({ "category": -1 }).exec(function (err, data) {
+          if (err) {
+            console.log(err)
+            return next(new errorResponse(`Something went wrong`, 500))
+          }
+          courses = data
+        })
+      }
+    } else {
+      courses = await Course.find({ approved: true }).limit(limit).skip(offset)
+    }
     totalCount = await Course.find({ approved: true }).countDocuments()
   } else {
     courses = await Course.find({}).limit(limit).skip(offset)
