@@ -93,3 +93,25 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
     message: 'Course was successfully deleted.'
   })
 })
+
+//@desc     Approve One or Multiple Courses
+//@route    PATCH /api/v1/courses/approve
+//@access   Private
+exports.approveCourses = asyncHandler(async (req, res, next) => {
+  const coursesToApprove = req.body.courses
+
+  // make sure courses are specified
+  if (!coursesToApprove) {
+    return next(new errorResponse(`Please specify single or multiple courses approve`, 400))
+  }
+
+  if (Array.isArray(coursesToApprove) && coursesToApprove.length > 0) {
+    // Approve single or multiple courses
+    await Course.updateMany({ _id: { $in: coursesToApprove } }, { approved: true })
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Specified courses were successfully approved.'
+  })
+})
