@@ -82,10 +82,8 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 //@route    POST /api/v1/courses
 //@access   Private
 exports.createCourse = asyncHandler(async (req, res, next) => {
-  //get the user details from the request body
+  //get the course details from the request body
   const { title, description, category, topics } = req.body
-  // set the user who created this course
-  // req.body.user = req.user.id
 
   //Save the course to the Database
   const course = await Course.create({
@@ -99,7 +97,19 @@ exports.createCourse = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+    data: course,
     message: "Course was sucessfully created."
+  })
+})
+
+//@desc     Add New Course
+//@route    POST /api/v1/courses/files
+//@access   Private
+exports.addFilesToCourse = asyncHandler(async (req, res, next) => {
+  // Controller is not complete
+  res.status(200).json({
+    success: true,
+    message: "Success message"
   })
 })
 
