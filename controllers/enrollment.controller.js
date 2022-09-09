@@ -64,3 +64,21 @@ exports.getEnrollments = asyncHandler(async (req, res, next) => {
     message: "Enrolled courses successfully fetched."
   })
 })
+
+//@desc     GET Single Enrollment
+//@route    GET /api/v1/enrollments/:enrollmentId
+//@access   Private
+exports.getEnrollment = asyncHandler(async (req, res, next) => {
+  // Check if course enrollment exists
+  const singleEnrollment = await Enrollment.findOne({ _id: req.params.enrollmentId, user: req.user.id })
+  if (!singleEnrollment) {
+    return next(new errorResponse(`Enrollment not found with id ${req.params.enrollmentId}`, 404))
+  }
+
+  // Return single enrolled course
+  res.status(200).json({
+    success: true,
+    data: singleEnrollment,
+    message: "Enrollment was successfully fetched."
+  })
+})
