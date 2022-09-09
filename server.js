@@ -2,6 +2,7 @@ const path = require('path')
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const fileUpload = require('express-fileupload')
 const connectDB = require('./config/db');
 const errorHandler = require('./middlewares/error')
 
@@ -19,6 +20,14 @@ const enrollment = require('./routes/enrollment.route')
 // Create App
 // This will be later separated into a separate folder
 const app = express()
+
+// Use public directory path
+app.use(express.static(path.join(__dirname, process.env.FILE_UPLOAD_PATH)))
+
+// Use File uploader
+app.use(fileUpload({
+  createParentPath: true
+}));
 
 // Use Morgin for logging requests
 app.use(morgan('dev'))
