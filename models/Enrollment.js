@@ -16,6 +16,10 @@ const TopicsSchema = new mongoose.Schema({
   progress: {
     type: Number,
     default: 0.0
+  },
+  topicCompleted: {
+    type: Boolean,
+    default: false
   }
 })
 
