@@ -14,6 +14,7 @@ connectDB()
 //Load Route Files
 const user = require('./routes/user.route')
 const course = require('./routes/course.route')
+const enrollment = require('./routes/enrollment.route')
 
 // Create App
 // This will be later separated into a separate folder
@@ -28,6 +29,7 @@ app.use(express.json())
 // Mount Routes
 app.use('/api/v1/users', user)
 app.use('/api/v1/courses', course)
+app.use('/api/v1/enrollments', enrollment)
 
 // Use Custom Error Handler
 app.use(errorHandler)
