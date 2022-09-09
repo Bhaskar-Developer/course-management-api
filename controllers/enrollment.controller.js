@@ -39,3 +39,28 @@ exports.createEnrollment = asyncHandler(async (req, res, next) => {
     message: "User successfully enrolled to course."
   })
 })
+
+//@desc     GET All Enrollments
+//@route    GET /api/v1/enrollments
+//@access   Private
+exports.getEnrollments = asyncHandler(async (req, res, next) => {
+  // Pagination Configuration
+  const page = req.query.page !== undefined ? parseInt(req.query.page) : 1
+  const limit = 20
+  const offset = limit * (page - 1)
+
+  // get the courses that the user has enrolled into
+  const enrollmentsOfUser = await Enrollment.find({ user: req.user.id }).limit(limit).skip(offset)
+  const totalCount = await Enrollment.find({ user: req.user.id }).countDocuments()
+
+  res.status(200).json({
+    success: true,
+    meta: {
+      page_size: limit,
+      current_page: page,
+      total_pages: Math.ceil(totalCount / limit)
+    },
+    data: enrollmentsOfUser,
+    message: "Enrolled courses successfully fetched."
+  })
+})
