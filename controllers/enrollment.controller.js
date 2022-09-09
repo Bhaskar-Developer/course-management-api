@@ -127,6 +127,21 @@ exports.updateEnrollment = asyncHandler(async (req, res, next) => {
   // Update enrollment with updated topic
   singleEnrollment.topics[foundTopicIndex] = topicToUpdate
 
+  // Calculate course completion percentage
+  let courseProgressDuration = 0
+  for (let i = 0; i <= singleEnrollment.topics.length - 1; i++) {
+    courseProgressDuration += singleEnrollment.topics[i].progress
+  }
+
+  // Update course completion percentage
+  if (courseProgressDuration >= singleEnrollment.totalDuration) {
+    // If overall progress of course is equal to total duration of course then it means the course is completed
+    singleEnrollment.completedPercentage = 100
+    singleEnrollment.completed = true
+  } else {
+    singleEnrollment.completedPercentage = (courseProgressDuration / singleEnrollment.totalDuration) * 100
+  }
+
   // update changes to DB
   await Enrollment.findOneAndUpdate({ _id: req.body.enrollmentId }, singleEnrollment)
 
